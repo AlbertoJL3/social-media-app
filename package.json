@@ -1,5 +1,4 @@
 {
-  "name": "Social Media Backend",
   "version": "1.0.1",
   "description": "Mongoose back-end project for social media app",
   "main": "index.js",
