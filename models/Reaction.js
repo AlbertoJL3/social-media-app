@@ -1,20 +1,26 @@
-// Reaction (SCHEMA ONLY)
+const mongoose = require("mongoose");
 
-// reactionId
+const ReactionSchema = new mongoose.Schema({
+  reactionId: {
+    type: mongoose.Types.ObjectId,
+    default: mongoose.Types.ObjectId
+  },
+  reactionBody: {
+    type: String,
+    required: true,
+    maxlength: 280
+  },
+  username: {
+    type: String,
+    required: true
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+    get: (createdAt) => createdAt.toLocaleString()
+  }
+});
 
-// Use Mongoose's ObjectId data type
-// Default value is set to a new ObjectId
-// reactionBody
+const Reaction = mongoose.model("Reaction", ReactionSchema);
 
-// String
-// Required
-// 280 character maximum
-// username
-
-// String
-// Required
-// createdAt
-
-// Date
-// Set default value to the current timestamp
-// Use a getter method to format the timestamp on query
+module.exports = Reaction;
