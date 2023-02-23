@@ -1,12 +1,13 @@
 const { Thought, User } = require('../models');
 
 module.exports = {
-  // Get all thought
+  // Get all thoughts
   getThoughts(req, res) {
     Thought.find()
       .then((thoughts) => res.json(thoughts))
       .catch((err) => res.status(500).json(err));
   },
+
   // Get a thought
   getSingleThought(req, res) {
     Thought.findOne({ _id: req.params.thoughtId })
@@ -27,6 +28,42 @@ module.exports = {
         return res.status(500).json(err);
       });
   },
+// Add a thought to another user's post
+addThought(req, res) {
+    const { thoughtId } = req.params;
+    const { username } = req.body;
+  
+    User.findOneAndUpdate(
+      { username: username },
+      { $push: { thoughts: thoughtId } },
+      { new: true, runValidators: true }
+    )
+      .then((user) =>
+        !user
+          ? res.status(404).json({ message: 'No user with that username' })
+          : res.json(user)
+      )
+      .catch((err) => res.status(500).json(err));
+  },
+  
+  // Remove a thought from another user's post
+  removeThought(req, res) {
+    const { thoughtId } = req.params;
+    const { username } = req.body;
+  
+    User.findOneAndUpdate(
+      { username: username },
+      { $pull: { thoughts: thoughtId } },
+      { new: true, runValidators: true }
+    )
+      .then((user) =>
+        !user
+          ? res.status(404).json({ message: 'No user with that username' })
+          : Thought.findOneAndDelete({ _id: thoughtId })
+      )
+      .then(() => res.json({ message: 'Thought deleted!' }))
+      .catch((err) => res.status(500).json(err));
+  },  
   // Delete a thought
   deleteThought(req, res) {
     Thought.findOneAndDelete({ _id: req.params.thoughtId })
@@ -38,6 +75,7 @@ module.exports = {
       .then(() => res.json({ message: 'thought and users deleted!' }))
       .catch((err) => res.status(500).json(err));
   },
+
   // Update a thought
   updateThought(req, res) {
     Thought.findOneAndUpdate(
