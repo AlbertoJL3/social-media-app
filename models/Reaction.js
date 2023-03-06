@@ -18,6 +18,11 @@ const ReactionSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
     get: (createdAt) => createdAt.toLocaleString()
+  },
+  thought: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Thought",
+    required: true
   }
 });
 
