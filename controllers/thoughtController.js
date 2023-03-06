@@ -28,11 +28,11 @@ module.exports = {
         return res.status(500).json(err);
       });
   },
-// Add a thought to another user's post
-addThought(req, res) {
+  // Add a thought to another user's post
+  addThought(req, res) {
     const { thoughtId } = req.params;
     const { username } = req.body;
-  
+
     User.findOneAndUpdate(
       { username: username },
       { $push: { thoughts: thoughtId } },
@@ -45,12 +45,12 @@ addThought(req, res) {
       )
       .catch((err) => res.status(500).json(err));
   },
-  
+
   // Remove a thought from another user's post
   removeThought(req, res) {
     const { thoughtId } = req.params;
     const { username } = req.body;
-  
+
     User.findOneAndUpdate(
       { username: username },
       { $pull: { thoughts: thoughtId } },
@@ -63,7 +63,7 @@ addThought(req, res) {
       )
       .then(() => res.json({ message: 'Thought deleted!' }))
       .catch((err) => res.status(500).json(err));
-  },  
+  },
   // Delete a thought
   deleteThought(req, res) {
     Thought.findOneAndDelete({ _id: req.params.thoughtId })
@@ -90,4 +90,25 @@ addThought(req, res) {
       )
       .catch((err) => res.status(500).json(err));
   },
+  // Add a reaction to a thought
+  addReaction(req, res) {
+    const { thoughtId } = req.params;
+    const { reactionBody, username } = req.body;
+
+    Reaction.create({ reactionBody, username })
+      .then((reaction) =>
+        Thought.findOneAndUpdate(
+          { _id: thoughtId },
+          { $push: { reactions: reaction } },
+          { new: true }
+        )
+      )
+      .then((thought) =>
+        !thought
+          ? res.status(404).json({ message: 'No thought with that ID' })
+          : res.json(thought)
+      )
+      .catch((err) => res.status(500).json(err));
+  },
+
 };
